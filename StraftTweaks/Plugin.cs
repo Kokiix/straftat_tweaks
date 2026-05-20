@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using BepInEx;
 using ComputerysModdingUtilities;
 using HarmonyLib;
@@ -8,18 +10,14 @@ using UnityEngine;
 [BepInPlugin("com.koki.tweaks", "STRAFTAT Tweaks", "1.0.0")]
 public class KokiWeaponsPlugin : BaseUnityPlugin
 {
-    internal static Harmony Harmony;
+    private Material[] _weaponMaterials;
 
     private void Awake()
     {
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
-        var shader = Shader.Find("S_WeaponOutline_00");
-        Debug.LogError(shader);
-    }
-
-    private void OnDestroy()
-    {
-
+        // Weapon outline color
+        var color = Config.Bind("General", "Weapon Outline Color", new Color(255, 209, 109));
+        WeaponOutlineColors.Init();
     }
 }
