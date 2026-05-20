@@ -7,14 +7,10 @@ public static class WeaponOutlineColors
 {
     private static Material[] _weaponMaterials;
 
-    private static readonly int _outlineProperty = Shader.PropertyToID("_Color_Outline");
+    private static readonly int _weaponOutline = Shader.PropertyToID("_Color_Outline");
+    private static readonly int _textOutline = Shader.PropertyToID("_OutlineColor");
 
-    internal static void Init()
-    {
-        GetWeaponMaterials();
-    }
-
-    private static void GetWeaponMaterials()
+    internal static void GetWeaponMaterials()
     {
         var outlineShaderID = Shader.Find("S_WeaponOutline_00").GetInstanceID();
         _weaponMaterials =
@@ -24,10 +20,10 @@ public static class WeaponOutlineColors
 
     internal static void SetColor(Color c)
     {
-        _weaponMaterials.Do(mat => mat.SetColor(_outlineProperty, c));
+        _weaponMaterials.Do(mat => mat.SetColor(_weaponOutline, c));
 
         // Yoinked from kestrel
-        PauseManager.Instance.grabPopup.fontMaterial.SetColor(m_propTextOutlineColor, color);
-        PauseManager.Instance.interactPopup.fontMaterial.SetColor(m_propTextOutlineColor, color);
+        PauseManager.Instance.grabPopup.fontMaterial.SetColor(_textOutline, c);
+        PauseManager.Instance.interactPopup.fontMaterial.SetColor(_textOutline, c);
     }
 }
