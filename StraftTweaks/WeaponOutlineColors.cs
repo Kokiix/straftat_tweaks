@@ -1,10 +1,13 @@
 
 using System.Linq;
+using HarmonyLib;
 using UnityEngine;
 
 public static class WeaponOutlineColors
 {
     private static Material[] _weaponMaterials;
+
+    private static readonly int _outlineProperty = Shader.PropertyToID("_Color_Outline");
 
     internal static void Init()
     {
@@ -17,5 +20,14 @@ public static class WeaponOutlineColors
         _weaponMaterials =
             Resources.FindObjectsOfTypeAll<Material>()
             .Where(mat => mat.shader.GetInstanceID() == outlineShaderID).ToArray();
+    }
+
+    internal static void SetColor(Color c)
+    {
+        _weaponMaterials.Do(mat => mat.SetColor(_outlineProperty, c));
+
+        // Yoinked from kestrel
+        PauseManager.Instance.grabPopup.fontMaterial.SetColor(m_propTextOutlineColor, color);
+        PauseManager.Instance.interactPopup.fontMaterial.SetColor(m_propTextOutlineColor, color);
     }
 }

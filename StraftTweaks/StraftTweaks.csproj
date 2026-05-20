@@ -37,6 +37,9 @@
         <Reference Include="ComputerysModdingUtilities">
             <HintPath>$(DLLs)\ComputerysModdingUtilities.dll</HintPath>
         </Reference>
+        <Reference Include="TextMeshProUGUI">
+            <HintPath>$(DLLs)\TextMeshProUGUI.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
     <Target Name="CopyDLL" AfterTargets="Build">

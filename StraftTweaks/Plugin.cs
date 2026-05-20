@@ -19,5 +19,6 @@ public class KokiWeaponsPlugin : BaseUnityPlugin
         // Weapon outline color
         var color = Config.Bind("General", "Weapon Outline Color", new Color(255, 209, 109));
         WeaponOutlineColors.Init();
+        WeaponOutlineColors.SetColor(color.Value);
     }
 }
