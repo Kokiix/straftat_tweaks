@@ -1,0 +1,7 @@
+bin
+obj
+.thunderstore/*.dll
+.thunderstore/*.zip
+.thunderstore/manifest.json
+.thunderstore/kokiWeaponsBundle
+issues.md
