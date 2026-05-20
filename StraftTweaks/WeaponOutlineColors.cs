@@ -18,12 +18,14 @@ public static class WeaponOutlineColors
             .Where(mat => mat.shader.GetInstanceID() == outlineShaderID).ToArray();
     }
 
-    internal static void SetColor(Color c)
+    internal static void SetColor(Color weaponColor, Color textColor)
     {
-        _weaponMaterials.Do(mat => mat.SetColor(_weaponOutline, c));
+        Debug.LogError(PauseManager.Instance.grabPopup.fontMaterial.GetColor("_OutlineColor").ToString());
+        _weaponMaterials.Do(mat => mat.SetColor(_weaponOutline, weaponColor));
 
         // Yoinked from kestrel
-        PauseManager.Instance.grabPopup.fontMaterial.SetColor(_textOutline, c);
-        PauseManager.Instance.interactPopup.fontMaterial.SetColor(_textOutline, c);
+        var HDR_color = textColor * new Vector4(2, 2, 2, 1);
+        PauseManager.Instance.grabPopup.fontMaterial.SetColor(_textOutline, HDR_color);
+        PauseManager.Instance.interactPopup.fontMaterial.SetColor(_textOutline, HDR_color);
     }
 }

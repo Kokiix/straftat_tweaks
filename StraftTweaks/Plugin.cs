@@ -17,9 +17,9 @@ public class KokiWeaponsPlugin : BaseUnityPlugin
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
         // Weapon outline color
-        var color = Config.Bind("General", "Weapon Outline Color", new Color(255, 209, 109));
+        var weaponColor = Config.Bind("General", "Weapon Outline Color", new Color(255, 209, 109));
+        var weaponTextColor = Config.Bind("General", "Weapon Interact Text Color", new Color(255, 141, 0));
         WeaponOutlineColors.GetWeaponMaterials();
-        Debug.LogError(PauseManager.Instance.grabPopup.fontMaterial.GetColor("_OutlineColor").ToString());
-        WeaponOutlineColors.SetColor(color.Value);
+        WeaponOutlineColors.SetColor(weaponColor.Value, weaponTextColor.Value);
     }
 }
