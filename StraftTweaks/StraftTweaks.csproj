@@ -6,10 +6,10 @@
 
         <BepInExPluginGuid>com.koki.tweaks</BepInExPluginGuid>
         <BepInExPluginName>STRAFTAT Tweaks</BepInExPluginName>
-        <BepInExPluginVersion>1.0.1</BepInExPluginVersion>
+        <BepInExPluginVersion>1.0.0</BepInExPluginVersion>
 
         <BepInExPluginDir>C:\Users\koki\AppData\Roaming\com.kesomannen.gale\straftat\profiles\Default\BepInEx\plugins</BepInExPluginDir>
-        <Thunderstore>$(ProjectDir)..\.thunderstore</Thunderstore>
+        <Thunderstore>..\.thunderstore</Thunderstore>
     </PropertyGroup>
 
     <ItemGroup>
@@ -33,34 +33,9 @@
     </ItemGroup>
 
     <!-- Release -->
-    <PropertyGroup>
-        <ThunderstoreName>STRAFTAT Tweaks</ThunderstoreName>
-        <WebsiteUrl>https://github.com/Kokiix/straftat_tweaks</WebsiteUrl>
-        <Description>Tweaks</Description>
-    </PropertyGroup>
     <Target Name="ReleaseBuild" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
-        <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(Thunderstore)\$(ThunderstoreName).dll" />
-        <PropertyGroup>
-            <ManifestContent>
-                {
-                "name": "$(ThunderstoreName)",
-                "version_number": "$(BepInExPluginVersion)",
-                "website_url": "$(WebsiteUrl)",
-                "description": "$(Description)",
-                "dependencies": [
-                "BepInEx-BepInExPack-5.4.21"
-                ]
-                }
-            </ManifestContent>
-        </PropertyGroup>
-        <WriteLinesToFile
-            File="$(Thunderstore)\manifest.json"
-            Lines="$(ManifestContent)"
-            Overwrite="true"
-            WriteOnlyWhenDifferent="true" />
-
-        <Exec Command="powershell -Command &quot;Compress-Archive -Path '$(Thunderstore)\*' -DestinationPath '$(ZipPath)' -Force&quot;" />
-        <Exec Command="tcli publish --file &quot;$(ZipPath)&quot;" ContinueOnError="false" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(Thunderstore)\dist" />
+        <Exec Command="tcli publish --config-path $(Thunderstore)\thunderstore.toml --package-version $(BepInExPluginVersion)" />
     </Target>
 
     <!-- Debug -->
@@ -70,10 +45,6 @@
             <DebugSymbols>true</DebugSymbols>
             <DebugType>embedded</DebugType>
         </PropertyGroup>
-        <Message Importance="high" Text="=== CopyDLL Target is executing ===" />
-        <Message Importance="high" Text="TargetPath is: '$(TargetPath)'" />
-        <Message Importance="high" Text="BepInExPlugins is: '$(BepInExPlugins)'" />
-        <Message Importance="high" Text="ThunderstoreName is: '$(ThunderstoreName)'" />
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BepInExPluginDir)\$(ThunderstoreName)" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BepInExPluginDir)\DEVELOPMENT-BUILD-$(BepInExPluginName)" />
     </Target>
 </Project>

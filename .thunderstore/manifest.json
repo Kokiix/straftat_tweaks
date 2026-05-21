@@ -1,9 +1,0 @@
-{
-                "name": "STRAFTAT Tweaks",
-                "version_number": "1.0.1",
-                "website_url": "https://github.com/Kokiix/straftat_tweaks",
-                "description": "Tweaks",
-                "dependencies": [
-                "BepInEx-BepInExPack-5.4.21"
-                ]
-                }
