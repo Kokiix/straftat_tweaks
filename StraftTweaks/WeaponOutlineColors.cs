@@ -23,7 +23,7 @@ static class SetOutlineColors
     static Color _weaponTextColor;
     static float _weaponTextBrightness;
 
-    internal static void Init()
+    internal static void SetConfigBinds()
     {
         _weaponColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Outline Color", new Color(1, 0.8196079f, 0.427451f)).Value;
         _weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(2, 1.106f, 0)).Value;
@@ -36,14 +36,15 @@ static class SetOutlineColors
 
     internal static void UpdateColorsFromConfig()
     {
-        Debug.LogError("trying to change colors");
+        SetConfigBinds();
+
         // Weapon mat
         _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, _weaponColor));
 
         // Weapon text yoinked from kestrel; Default text is RGBA(2.000, 1.106, 0.000, 1.000)
         var HDR_color = _weaponTextColor * Vector4.one * _weaponTextBrightness;
-        PauseManager.Instance.grabPopup.fontMaterial.SetColor(_textOutline, HDR_color);
-        PauseManager.Instance.interactPopup.fontMaterial.SetColor(_textOutline, HDR_color);
+        PauseManager.Instance.grabPopup.fontSharedMaterial.SetColor(_textOutline, HDR_color);
+        PauseManager.Instance.interactPopup.fontSharedMaterial.SetColor(_textOutline, HDR_color);
     }
 
     static void Postfix()

@@ -25,7 +25,7 @@ public class STRAFTweakPlugin : BaseUnityPlugin
 
         if (ModMenuCompat)
         {
-            SetOutlineColors.Init();
+            SetOutlineColors.SetConfigBinds();
             ModMenuCustomisation.SetPluginDescription("Tweak things like weapon outline color :D");
             ModMenuCustomisation.RegisterContentBuilder(WeaponOutlineColors.ModMenu.ConfigBuilder);
         }
