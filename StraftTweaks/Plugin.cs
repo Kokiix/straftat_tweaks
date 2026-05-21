@@ -12,13 +12,12 @@ public class STRAFTweakPlugin : BaseUnityPlugin
 {
     internal static STRAFTweakPlugin Instance;
 
-    private void Awake()
+    void Awake()
     {
         Instance = this;
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
         // Weapon outline color
-        SetOutlineColors.UpdateColorsFromConfig();
         var compat = new WeaponOutlineColors.ModMenuCompat();
         if (compat.Enabled)
             ModMenuCustomisation.RegisterContentBuilder(compat.ConfigBuilder);

@@ -8,10 +8,11 @@ using UnityEngine;
 
 namespace WeaponOutlineColors;
 
-public static class SetOutlineColors
+[HarmonyPatch(typeof(PauseManager), "Start")]
+static class SetOutlineColors
 {
     // Hmmm this Resources.FindObjectsOfTypeAll call isn't even compatible with my own weapons mod... I think that's my other mod's fault tho
-    private static Lazy<Material[]> _weaponMaterials = new(() =>
+    static Lazy<Material[]> _weaponMaterials = new(() =>
     {
         var outlineShaderID = Shader.Find("S_WeaponOutline_00").GetInstanceID();
         return Resources.FindObjectsOfTypeAll<Material>()
@@ -19,25 +20,31 @@ public static class SetOutlineColors
     });
 
 
-    private static readonly int _weaponOutline = Shader.PropertyToID("_Color_Outline");
-    private static readonly int _textOutline = Shader.PropertyToID("_OutlineColor");
+    static readonly int _weaponOutline = Shader.PropertyToID("_Color_Outline");
+    static readonly int _textOutline = Shader.PropertyToID("_OutlineColor");
 
     internal static void UpdateColorsFromConfig()
     {
         var weaponColor = STRAFTweakPlugin.Instance.Config.Bind("General", "Weapon Outline Color", new Color(255, 209, 109)).Value;
         var weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("General", "Weapon Interact Text Color", new Color(255, 141, 0)).Value;
+        var weaponTextBrightness = STRAFTweakPlugin.Instance.Config.Bind("General", "Weapon Interact Text Brightness", 2).Value;
 
-        Debug.LogError(PauseManager.Instance.grabPopup.fontMaterial.GetColor("_OutlineColor").ToString());
+        // Weapon mat
         _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, weaponColor));
 
-        // Yoinked from kestrel
-        var HDR_color = weaponTextColor * new Vector4(2, 2, 2, 1);
+        // Weapon text yoinked from kestrel
+        var HDR_color = weaponTextColor * new Vector4(weaponTextBrightness, weaponTextBrightness, weaponTextBrightness, 1);
         PauseManager.Instance.grabPopup.fontMaterial.SetColor(_textOutline, HDR_color);
         PauseManager.Instance.interactPopup.fontMaterial.SetColor(_textOutline, HDR_color);
     }
+
+    static void Postfix()
+    {
+        UpdateColorsFromConfig();
+    }
 }
 
-public class ModMenuCompat
+class ModMenuCompat
 {
     internal bool Enabled { get => BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid); }
 
