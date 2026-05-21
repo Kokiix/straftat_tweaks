@@ -1,4 +1,9 @@
 bin
 obj
-.thunderstore/*
 issues.md
+
+.thunderstore/*
+!.thunderstore/CHANGELOG.md
+!.thunderstore/icon.png
+!.thunderstore/LICENSE.txt
+!.thunderstore/README.md

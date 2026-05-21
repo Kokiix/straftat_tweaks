@@ -1,44 +1,79 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>Latest</LangVersion>
         <Authors>Koki</Authors>
-        <Version>1.0.0</Version>
 
-        <RestoreAdditionalProjectSources>
-            https://api.nuget.org/v3/index.json;
-            https://nuget.bepinex.dev/v3/index.json;
-            https://nuget.windows10ce.com/nuget/v3/index.json
-        </RestoreAdditionalProjectSources>
+        <BepInExPluginGuid>com.koki.tweaks</BepInExPluginGuid>
+        <BepInExPluginName>STRAFTAT Tweaks</BepInExPluginName>
+        <BepInExPluginVersion>1.0.1</BepInExPluginVersion>
+
+        <BepInExPluginDir>C:\Users\koki\AppData\Roaming\com.kesomannen.gale\straftat\profiles\Default\BepInEx\plugins</BepInExPluginDir>
+        <Thunderstore>$(ProjectDir)..\.thunderstore</Thunderstore>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
-        <PackageReference Include="BepInEx.Core" Version="5.*" ExcludeAssets="runtime" />
+        <PackageReference Include="BepInEx.Analyzers" Version="*" PrivateAssets="all" />
+        <PackageReference Include="BepInEx.Core" Version="*" ExcludeAssets="runtime" />
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="*" PrivateAssets="all" IncludeAssets="build" />
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="*" />
         <PackageReference Include="UnityEngine.Modules" Version="2021.3.45" IncludeAssets="compile" PrivateAssets="all" />
-        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" IncludeAssets="build" />
     </ItemGroup>
 
-    
+    <!-- Dependencies -->
     <PropertyGroup>
-        <IncludeSymbols>true</IncludeSymbols>
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>embedded</DebugType>
-
         <DLLs>D:\SteamLibrary\steamapps\common\STRAFTAT\STRAFTAT_Data\Managed</DLLs>
-        <BepInExPlugins>C:\Users\koki\AppData\Roaming\com.kesomannen.gale\straftat\profiles\Default\BepInEx\plugins</BepInExPlugins>
     </PropertyGroup>
-
     <ItemGroup>
+        <PackageReference Include="kestrel-Mod_Menu" Version="*" />
+
         <Reference Include="$(DLLs)\Assembly-CSharp.dll" Publicize="true" />
         <Reference Include="$(DLLs)\ComputerysModdingUtilities.dll" />
         <Reference Include="$(DLLs)\Unity.TextMeshPro.dll" />
-
-        <Reference Include="..\lib\ModMenu.dll" />
     </ItemGroup>
 
-    <Target Name="CopyDLL" AfterTargets="Build">
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BepInExPlugins)\StraftTweaks" />
+    <!-- Release -->
+    <PropertyGroup>
+        <ThunderstoreName>STRAFTAT Tweaks</ThunderstoreName>
+        <WebsiteUrl>https://github.com/Kokiix/straftat_tweaks</WebsiteUrl>
+        <Description>Tweaks</Description>
+    </PropertyGroup>
+    <Target Name="ReleaseBuild" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
+        <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(Thunderstore)\$(ThunderstoreName).dll" />
+        <PropertyGroup>
+            <ManifestContent>
+                {
+                "name": "$(ThunderstoreName)",
+                "version_number": "$(BepInExPluginVersion)",
+                "website_url": "$(WebsiteUrl)",
+                "description": "$(Description)",
+                "dependencies": [
+                "BepInEx-BepInExPack-5.4.21"
+                ]
+                }
+            </ManifestContent>
+        </PropertyGroup>
+        <WriteLinesToFile
+            File="$(Thunderstore)\manifest.json"
+            Lines="$(ManifestContent)"
+            Overwrite="true"
+            WriteOnlyWhenDifferent="true" />
+
+        <Exec Command="powershell -Command &quot;Compress-Archive -Path '$(Thunderstore)\*' -DestinationPath '$(ZipPath)' -Force&quot;" />
+        <Exec Command="tcli publish --file &quot;$(ZipPath)&quot;" ContinueOnError="false" />
+    </Target>
+
+    <!-- Debug -->
+    <Target Name="CopyDLL" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
+        <PropertyGroup>
+            <IncludeSymbols>true</IncludeSymbols>
+            <DebugSymbols>true</DebugSymbols>
+            <DebugType>embedded</DebugType>
+        </PropertyGroup>
+        <Message Importance="high" Text="=== CopyDLL Target is executing ===" />
+        <Message Importance="high" Text="TargetPath is: '$(TargetPath)'" />
+        <Message Importance="high" Text="BepInExPlugins is: '$(BepInExPlugins)'" />
+        <Message Importance="high" Text="ThunderstoreName is: '$(ThunderstoreName)'" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BepInExPluginDir)\$(ThunderstoreName)" />
     </Target>
 </Project>

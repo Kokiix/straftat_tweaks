@@ -4,7 +4,7 @@
         {
             "label": "echo",
             "type": "shell",
-            "command": "dotnet build StraftTweaks",
+            "command": "dotnet build StraftTweaks -c Debug",
             "group": {
                 "kind": "build",
                 "isDefault": true
