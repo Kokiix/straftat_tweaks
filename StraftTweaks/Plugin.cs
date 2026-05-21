@@ -1,5 +1,6 @@
 using BepInEx;
 using ComputerysModdingUtilities;
+using HarmonyLib;
 using ModMenu.Api;
 using UnityEngine;
 using WeaponOutlineColors;
@@ -12,14 +13,25 @@ public class STRAFTweakPlugin : BaseUnityPlugin
 {
     internal static STRAFTweakPlugin Instance;
 
+    Harmony _harmony = new("com.koki.tweaks");
+
     void Awake()
     {
+        _harmony.PatchAll();
         Instance = this;
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
         // Weapon outline color
         var compat = new WeaponOutlineColors.ModMenuCompat();
         if (compat.Enabled)
+        {
+            Debug.LogError("running!");
             ModMenuCustomisation.RegisterContentBuilder(compat.ConfigBuilder);
+        }
+    }
+
+    void OnDestroy()
+    {
+        _harmony.UnpatchSelf();
     }
 }

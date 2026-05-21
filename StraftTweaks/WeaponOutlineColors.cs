@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace WeaponOutlineColors;
 
-[HarmonyPatch(typeof(PauseManager), "Start")]
+[HarmonyPatch(typeof(PauseManager), "Awake")]
 static class SetOutlineColors
 {
     // Hmmm this Resources.FindObjectsOfTypeAll call isn't even compatible with my own weapons mod... I think that's my other mod's fault tho
@@ -40,16 +40,17 @@ static class SetOutlineColors
 
     static void Postfix()
     {
+        Debug.LogError("test");
         UpdateColorsFromConfig();
     }
 }
 
-class ModMenuCompat
+public class ModMenuCompat
 {
     internal bool Enabled { get => BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid); }
 
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-    internal void ConfigBuilder(OptionListContext c)
+    public void ConfigBuilder(OptionListContext c)
     {
         c.InsertHeader(13, "Test Section 1");
     }
