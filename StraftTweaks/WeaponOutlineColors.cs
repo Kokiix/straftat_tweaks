@@ -1,11 +1,14 @@
 
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using ModMenu.Api;
 using UnityEngine;
 
-public static class WeaponOutlineColors
+namespace WeaponOutlineColors;
+
+public static class SetOutlineColors
 {
     // Hmmm this Resources.FindObjectsOfTypeAll call isn't even compatible with my own weapons mod... I think that's my other mod's fault tho
     private static Lazy<Material[]> _weaponMaterials = new(() =>
@@ -32,13 +35,15 @@ public static class WeaponOutlineColors
         PauseManager.Instance.grabPopup.fontMaterial.SetColor(_textOutline, HDR_color);
         PauseManager.Instance.interactPopup.fontMaterial.SetColor(_textOutline, HDR_color);
     }
+}
 
-    public static class ModMenuCompat
+public class ModMenuCompat
+{
+    internal bool Enabled { get => BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid); }
+
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+    internal void ConfigBuilder(OptionListContext c)
     {
-        internal static bool enabled { get => BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid); }
-        internal static void WeaponColorBuilder(OptionListContext c)
-        {
-
-        }
+        c.InsertHeader(13, "Test Section 1");
     }
 }

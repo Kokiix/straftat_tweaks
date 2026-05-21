@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
 using BepInEx;
 using ComputerysModdingUtilities;
-using HarmonyLib;
 using ModMenu.Api;
 using UnityEngine;
+using WeaponOutlineColors;
 
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -20,8 +18,9 @@ public class STRAFTweakPlugin : BaseUnityPlugin
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
         // Weapon outline color
-        WeaponOutlineColors.UpdateColorsFromConfig();
-        if (WeaponOutlineColors.ModMenuCompat.enabled)
-            ModMenuCustomisation.RegisterContentBuilder(WeaponOutlineColors.ModMenuCompat.WeaponColorBuilder);
+        SetOutlineColors.UpdateColorsFromConfig();
+        var compat = new WeaponOutlineColors.ModMenuCompat();
+        if (compat.Enabled)
+            ModMenuCustomisation.RegisterContentBuilder(compat.ConfigBuilder);
     }
 }
