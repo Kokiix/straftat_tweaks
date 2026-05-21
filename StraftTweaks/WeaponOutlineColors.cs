@@ -25,9 +25,9 @@ static class SetOutlineColors
 
     internal static void Init()
     {
-        _weaponColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Outline Color", new Color(255, 209, 109)).Value;
-        _weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(255, 141, 0)).Value;
-        _weaponTextBrightness = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 2).Value;
+        _weaponColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Outline Color", new Color(1, 0.8196079f, 0.427451f)).Value;
+        _weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(2, 1.106f, 0)).Value;
+        _weaponTextBrightness = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 1).Value;
     }
 
 
@@ -36,7 +36,7 @@ static class SetOutlineColors
 
     internal static void UpdateColorsFromConfig()
     {
-        // Weapon mat
+        // // Weapon mat
         _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, _weaponColor));
 
         // Weapon text yoinked from kestrel; Default text is RGBA(2.000, 1.106, 0.000, 1.000)
@@ -56,6 +56,6 @@ static class ModMenu
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     internal static void ConfigBuilder(OptionListContext c)
     {
-        c.AppendHeader("Test Section :3");
+        c.AppendButton("Apply Changes", "Apply Changes", SetOutlineColors.UpdateColorsFromConfig);
     }
 }
