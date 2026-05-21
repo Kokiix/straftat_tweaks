@@ -56,9 +56,15 @@ static class SetOutlineColors
         PauseManager.Instance.interactPopup.fontSharedMaterial.SetColor(_textOutline, HDR_color);
     }
 
+    // TODO: Find patch where the thing actually only runs once, but isn't too early like Awake
+    static bool HasRanOnStartup = false;
     static void Postfix()
     {
-        UpdateColorsFromConfig();
+        if (!HasRanOnStartup)
+        {
+            UpdateColorsFromConfig();
+            HasRanOnStartup = true;
+        }
     }
 }
 
