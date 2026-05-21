@@ -15,18 +15,18 @@ public class STRAFTweakPlugin : BaseUnityPlugin
 
     Harmony _harmony = new("com.koki.tweaks");
 
+    internal bool ModMenuCompat { get => BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid); }
+
     void Awake()
     {
         _harmony.PatchAll();
         Instance = this;
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
-        // Weapon outline color
-        var compat = new WeaponOutlineColors.ModMenuCompat();
-        if (compat.Enabled)
+        if (ModMenuCompat)
         {
-            Debug.LogError("running!");
-            ModMenuCustomisation.RegisterContentBuilder(compat.ConfigBuilder);
+            ModMenuCustomisation.HideEntry(Config.Bind("Secret :3", "Mod menu only activates if I bind in Awake :(", 0));
+            ModMenuCustomisation.RegisterContentBuilder(WeaponOutlineColors.ModMenu.ConfigBuilder);
         }
     }
 

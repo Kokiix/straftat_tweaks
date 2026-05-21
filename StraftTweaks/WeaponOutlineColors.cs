@@ -11,7 +11,7 @@ namespace WeaponOutlineColors;
 [HarmonyPatch(typeof(PauseManager), "Awake")]
 static class SetOutlineColors
 {
-    // Hmmm this Resources.FindObjectsOfTypeAll call isn't even compatible with my own weapons mod... I think that's my other mod's fault tho
+    // Resources.FindObjectsOfTypeAll won't work my own weapons mod lol (for now)
     static Lazy<Material[]> _weaponMaterials = new(() =>
     {
         var outlineShaderID = Shader.Find("S_WeaponOutline_00").GetInstanceID();
@@ -32,7 +32,7 @@ static class SetOutlineColors
         // Weapon mat
         _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, weaponColor));
 
-        // Weapon text yoinked from kestrel
+        // Weapon text yoinked from kestrel; Default text is RGBA(2.000, 1.106, 0.000, 1.000)
         var HDR_color = weaponTextColor * new Vector4(weaponTextBrightness, weaponTextBrightness, weaponTextBrightness, 1);
         PauseManager.Instance.grabPopup.fontMaterial.SetColor(_textOutline, HDR_color);
         PauseManager.Instance.interactPopup.fontMaterial.SetColor(_textOutline, HDR_color);
@@ -40,18 +40,15 @@ static class SetOutlineColors
 
     static void Postfix()
     {
-        Debug.LogError("test");
         UpdateColorsFromConfig();
     }
 }
 
-public class ModMenuCompat
+static class ModMenu
 {
-    internal bool Enabled { get => BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid); }
-
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-    public void ConfigBuilder(OptionListContext c)
+    internal static void ConfigBuilder(OptionListContext c)
     {
-        c.InsertHeader(13, "Test Section 1");
+        c.AppendHeader("Test Section :3");
     }
 }
