@@ -31,15 +31,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="Assembly-CSharp" Publicize="true">
-            <HintPath>$(DLLs)\Assembly-CSharp.dll</HintPath>
-        </Reference>
-        <Reference Include="ComputerysModdingUtilities">
-            <HintPath>$(DLLs)\ComputerysModdingUtilities.dll</HintPath>
-        </Reference>
-        <Reference Include="TextMeshProUGUI">
-            <HintPath>$(DLLs)\Unity.TextMeshPro.dll</HintPath>
-        </Reference>
+        <Reference Include="$(DLLs)\Assembly-CSharp.dll" Publicize="true" />
+        <Reference Include="$(DLLs)\ComputerysModdingUtilities.dll" />
+        <Reference Include="$(DLLs)\Unity.TextMeshPro.dll" />
+
+        <Reference Include="..\lib\ModMenu.dll" />
     </ItemGroup>
 
     <Target Name="CopyDLL" AfterTargets="Build">
