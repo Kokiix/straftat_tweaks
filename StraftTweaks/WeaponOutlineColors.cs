@@ -11,13 +11,12 @@ namespace WeaponOutlineColors;
 [HarmonyPatch(typeof(PauseManager), "Awake")]
 static class SetOutlineColors
 {
-    // Resources.FindObjectsOfTypeAll won't work my own weapons mod lol (for now)
+    static readonly int outlineShaderID = Shader.Find("S_WeaponOutline_00").GetInstanceID();
+
     static Lazy<Material[]> _weaponMaterials = new(() =>
-    {
-        var outlineShaderID = Shader.Find("S_WeaponOutline_00").GetInstanceID();
-        return Resources.FindObjectsOfTypeAll<Material>()
-        .Where(mat => mat.shader.GetInstanceID() == outlineShaderID).ToArray();
-    });
+        Resources.FindObjectsOfTypeAll<Material>()
+        .Where(mat => mat.shader.GetInstanceID() == outlineShaderID).ToArray()
+    );
 
     static Color _weaponColor;
     static Color _weaponTextColor;
@@ -38,8 +37,22 @@ static class SetOutlineColors
     {
         SetConfigBinds();
 
-        // Weapon mat
+        // Stored mats
         _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, _weaponColor));
+
+        // Active mats
+        foreach (var renderer in UnityEngine.Object.FindObjectsOfType<Renderer>())
+        {
+            var sharedMats = renderer.sharedMaterials;
+            for (int i = 0; i < sharedMats.Length; i++)
+            {
+                var mat = sharedMats[i];
+                if (mat != null && mat.shader != null && mat.shader.GetInstanceID() == outlineShaderID)
+                {
+                    mat.SetColor(_weaponOutline, _weaponColor);
+                }
+            }
+        }
 
         // Weapon text yoinked from kestrel; Default text is RGBA(2.000, 1.106, 0.000, 1.000)
         var HDR_color = _weaponTextColor * Vector4.one * _weaponTextBrightness;
