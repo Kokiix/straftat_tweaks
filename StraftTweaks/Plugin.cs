@@ -25,7 +25,8 @@ public class STRAFTweakPlugin : BaseUnityPlugin
 
         if (ModMenuCompat)
         {
-            ModMenuCustomisation.HideEntry(Config.Bind("Secret :3", "Mod menu only activates if I bind in Awake :(", 0));
+            SetOutlineColors.Init();
+            ModMenuCustomisation.SetPluginDescription("Tweak things like weapon outline color :D");
             ModMenuCustomisation.RegisterContentBuilder(WeaponOutlineColors.ModMenu.ConfigBuilder);
         }
     }

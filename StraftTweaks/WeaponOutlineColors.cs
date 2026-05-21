@@ -19,21 +19,28 @@ static class SetOutlineColors
         .Where(mat => mat.shader.GetInstanceID() == outlineShaderID).ToArray();
     });
 
+    static Color _weaponColor;
+    static Color _weaponTextColor;
+    static int _weaponTextBrightness;
+
+    internal static void Init()
+    {
+        _weaponColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Outline Color", new Color(255, 209, 109)).Value;
+        _weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(255, 141, 0)).Value;
+        _weaponTextBrightness = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 2).Value;
+    }
+
 
     static readonly int _weaponOutline = Shader.PropertyToID("_Color_Outline");
     static readonly int _textOutline = Shader.PropertyToID("_OutlineColor");
 
     internal static void UpdateColorsFromConfig()
     {
-        var weaponColor = STRAFTweakPlugin.Instance.Config.Bind("General", "Weapon Outline Color", new Color(255, 209, 109)).Value;
-        var weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("General", "Weapon Interact Text Color", new Color(255, 141, 0)).Value;
-        var weaponTextBrightness = STRAFTweakPlugin.Instance.Config.Bind("General", "Weapon Interact Text Brightness", 2).Value;
-
         // Weapon mat
-        _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, weaponColor));
+        _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, _weaponColor));
 
         // Weapon text yoinked from kestrel; Default text is RGBA(2.000, 1.106, 0.000, 1.000)
-        var HDR_color = weaponTextColor * new Vector4(weaponTextBrightness, weaponTextBrightness, weaponTextBrightness, 1);
+        var HDR_color = _weaponTextColor * Vector4.one * _weaponTextBrightness;
         PauseManager.Instance.grabPopup.fontMaterial.SetColor(_textOutline, HDR_color);
         PauseManager.Instance.interactPopup.fontMaterial.SetColor(_textOutline, HDR_color);
     }
