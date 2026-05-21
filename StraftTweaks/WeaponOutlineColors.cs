@@ -12,11 +12,11 @@ namespace WeaponOutlineColors;
 static class SetOutlineColors
 {
     static readonly int outlineShaderID = Shader.Find("S_WeaponOutline_00").GetInstanceID();
-
-    static Lazy<Renderer[]> _weaponRenderers = new(() =>
-        Resources.FindObjectsOfTypeAll<Renderer>()
-        .Where(rend => rend.sharedMaterial && rend.sharedMaterial.shader.GetInstanceID() == outlineShaderID).ToArray()
-    );
+    static Lazy<Material[]> _weaponMaterials = new(() =>
+    {
+        return Resources.FindObjectsOfTypeAll<Material>()
+        .Where(mat => mat.shader.GetInstanceID() == outlineShaderID).ToArray();
+    });
 
     static Color _weaponColor;
     static Color _weaponTextColor;
@@ -37,12 +37,16 @@ static class SetOutlineColors
     {
         SetConfigBinds();
 
-        // Weapon mat
-        foreach (var rend in _weaponRenderers.Value)
+        // Update stored materials
+        _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, _weaponColor));
+
+        // Update live materials
+        foreach (var renderer in UnityEngine.Object.FindObjectsOfType<Renderer>())
         {
-            foreach (var mat in rend.sharedMaterials)
+            foreach (var mat in renderer.sharedMaterials)
             {
-                mat.SetColor(_weaponOutline, _weaponColor);
+                if (mat && mat.shader.GetInstanceID() == outlineShaderID)
+                    mat.SetColor(_weaponOutline, _weaponColor);
             }
         }
 
