@@ -2,18 +2,19 @@ using BepInEx;
 using ComputerysModdingUtilities;
 using HarmonyLib;
 using ModMenu.Api;
+using StraftTweaks;
 using UnityEngine;
 using WeaponOutlineColors;
 
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
 [BepInDependency(ModMenu.PluginInfo.guid, BepInDependency.DependencyFlags.SoftDependency)]
-[BepInPlugin("com.koki.tweaks", "STRAFTAT Tweaks", "1.0.0")]
+[BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class STRAFTweakPlugin : BaseUnityPlugin
 {
     internal static STRAFTweakPlugin Instance;
 
-    Harmony _harmony = new("com.koki.tweaks");
+    Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
 
     internal bool ModMenuCompat { get => BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid); }
 
