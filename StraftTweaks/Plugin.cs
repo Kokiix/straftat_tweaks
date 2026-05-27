@@ -16,14 +16,13 @@ public class STRAFTweakPlugin : BaseUnityPlugin
 
     Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
 
-    internal bool ModMenuCompat { get => BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid); }
-
     void Awake()
     {
         _harmony.PatchAll();
         Instance = this;
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
+        var ModMenuCompat = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid);
         if (ModMenuCompat)
         {
             SetOutlineColors.SetConfigBinds();
