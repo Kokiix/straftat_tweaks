@@ -1,7 +1,6 @@
 using BepInEx;
 using ComputerysModdingUtilities;
 using HarmonyLib;
-using ModMenu.Api;
 using StraftTweaks;
 using UnityEngine;
 using WeaponOutlineColors;
@@ -22,13 +21,9 @@ public class STRAFTweakPlugin : BaseUnityPlugin
         Instance = this;
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
-        var ModMenuCompat = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid);
-        if (ModMenuCompat)
-        {
-            SetOutlineColors.SetConfigBinds();
-            ModMenuCustomisation.SetPluginDescription("Tweak things like weapon outline color :D");
-            ModMenuCustomisation.RegisterContentBuilder(WeaponOutlineColors.ModMenu.ConfigBuilder);
-        }
+        var modMenuLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid);
+        if (modMenuLoaded) WeaponOutlineColors.ModMenuCompat.Start();
+
     }
 
     void OnDestroy()

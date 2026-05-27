@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
-using ModMenu.Api;
 using UnityEngine;
 
 namespace WeaponOutlineColors;
@@ -64,10 +63,17 @@ static class SetOutlineColors
     }
 }
 
-static class ModMenu
+static class ModMenuCompat
 {
+    internal static void Start()
+    {
+        SetOutlineColors.SetConfigBinds();
+        ModMenu.Api.ModMenuCustomisation.SetPluginDescription("Tweak things like weapon outline color :D");
+        ModMenu.Api.ModMenuCustomisation.RegisterContentBuilder(WeaponOutlineColors.ModMenuCompat.ConfigBuilder);
+    }
+
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-    internal static void ConfigBuilder(OptionListContext c)
+    internal static void ConfigBuilder(ModMenu.Api.OptionListContext c)
     {
         c.AppendButton("Apply Changes", "Apply Changes", SetOutlineColors.UpdateColorsFromConfig);
     }
