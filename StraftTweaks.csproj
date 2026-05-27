@@ -6,10 +6,10 @@
 
         <BepInExPluginGuid>com.koki.tweaks</BepInExPluginGuid>
         <BepInExPluginName>STRAFTAT Tweaks</BepInExPluginName>
-        <BepInExPluginVersion>1.0.3</BepInExPluginVersion>
+        <BepInExPluginVersion>1.1.0</BepInExPluginVersion>
 
         <BepInExPluginDir>C:\Users\koki\AppData\Roaming\com.kesomannen.gale\straftat\profiles\Default\BepInEx\plugins</BepInExPluginDir>
-        <Thunderstore>..\.thunderstore</Thunderstore>
+        <Thunderstore>.\.thunderstore</Thunderstore>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,22 +29,36 @@
 
         <Reference Include="$(DLLs)\Assembly-CSharp.dll" Publicize="true" />
         <Reference Include="$(DLLs)\ComputerysModdingUtilities.dll" />
+
         <Reference Include="$(DLLs)\Unity.TextMeshPro.dll" />
+        <Reference Include="$(DLLs)\UnityEngine.UI.dll" />
     </ItemGroup>
 
-    <!-- Release -->
-    <Target Name="ReleaseBuild" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(Thunderstore)\dist" />
-        <Exec Command="tcli publish --config-path $(Thunderstore)\thunderstore.toml --package-version $(BepInExPluginVersion)" />
+    <ItemGroup>
+        <ModContents Include="$(BepInExPluginDir)\DEVELOPMENT-BUILD-$(BepInExPluginName)\**\*" />
+    </ItemGroup>
+
+    <!-- TCLI stuff -->
+    <Target Name="TCLI" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Build'">
+        <!-- Prepare TCLI -->
+        <RemoveDir Condition="Exists('$(Thunderstore)\dist')" Directories="$(Thunderstore)\dist" />
+        <Copy SourceFiles="@(ModContents)" DestinationFiles="$(Thunderstore)\dist\%(RecursiveDir)%(Filename)%(Extension)" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(Thunderstore)\dist\" />
+
+        <!-- Publish -->
+        <Exec Condition="'$(Configuration)' == 'Release'" Command="tcli publish --config-path $(Thunderstore)\thunderstore.toml --package-version $(BepInExPluginVersion)" />
+
+        <!-- Build -->
+        <Exec Condition="'$(Configuration)' == 'Build'" Command="tcli build --config-path $(Thunderstore)\thunderstore.toml --package-version $(BepInExPluginVersion)" />
     </Target>
 
     <!-- Debug -->
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <IncludeSymbols>true</IncludeSymbols>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>embedded</DebugType>
+    </PropertyGroup>
     <Target Name="CopyDLL" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
-        <PropertyGroup>
-            <IncludeSymbols>true</IncludeSymbols>
-            <DebugSymbols>true</DebugSymbols>
-            <DebugType>embedded</DebugType>
-        </PropertyGroup>
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BepInExPluginDir)\DEVELOPMENT-BUILD-$(BepInExPluginName)" />
     </Target>
 </Project>
