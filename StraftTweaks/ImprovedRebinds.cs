@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using BepInEx;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
@@ -26,8 +27,6 @@ static class Util
         }
         else
         {
-            Debug.LogError("erasing vector thing");
-            actionToRebind.ChangeBinding(1).Erase();
             actionToRebind.AddBinding("<Mouse>/scroll");
         }
         actionToRebind.ChangeBinding(0).Erase();
@@ -69,6 +68,19 @@ static class ResetBinding
         inputAction.bindings.Do(b => Debug.LogError(b));
     }
 }
+
+[HarmonyPatch(typeof(InputManager), "LoadBindingOverride")]
+static class ApplyOverride
+{
+    static void Prefix(string actionName)
+    {
+        var overrideString = PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1");
+        if (overrideString.IsNullOrWhiteSpace()) return;
+
+        Util.SetBindingType(BindingType.Keypress);
+    }
+}
+
 
 // [HarmonyPatch(typeof(InputManager), "SaveBindingOverride")]
 // static class Test
