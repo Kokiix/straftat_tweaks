@@ -14,20 +14,11 @@ static class Util
     internal static void ReplaceVectorWithComposite(string actionName)
     {
         var actionToRebind = InputManager.inputActions.asset.FindAction(actionName);
-        actionToRebind.expectedControlType = "2DVector";
-
-        // remove mouse bind
-        int scrollIndex = actionToRebind.bindings.IndexOf(b => b.path == "<Mouse>/scroll");
-        if (scrollIndex != -1)
+        if (actionToRebind.bindings[0].path == "<Mouse>/scroll")
         {
-            actionToRebind.ChangeBinding(scrollIndex).Erase();
+            actionToRebind.ChangeBinding(0).Erase();
+            actionToRebind.AddCompositeBinding("2DVector").With("Up", "<Keyboard>/T");
         }
-
-        // find/create composite bind
-        var newBindIdx = actionToRebind.bindings.IndexOf(b => b.isPartOfComposite);
-        if (newBindIdx == -1)
-            actionToRebind.AddCompositeBinding("2DVector")
-            .With("Up", "<Keyboard>/T");
     }
 }
 
