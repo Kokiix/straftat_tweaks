@@ -48,15 +48,19 @@ static class ModMenuCompat
     internal static void Start()
     {
         ModMenu.Api.ModMenuCustomisation.SetPluginDescription("Tweak things like weapon outline color or mouse wheel binds :D");
+
         SetOutlineColors.SetConfigBinds();
         ScrollJump.SetConfigBinds();
+
+        ModMenu.Api.ModMenuCustomisation.HideEntry(ScrollJump.isEnabled);
         ModMenu.Api.ModMenuCustomisation.RegisterContentBuilder(ConfigBuilder);
     }
 
     static void ConfigBuilder(ModMenu.Api.OptionListContext c)
     {
-        c.AppendButton("Apply Changes", "Apply Changes", SetOutlineColors.UpdateColorsFromConfig);
+        c.InsertButton(4, "Apply Changes", "Apply Changes", SetOutlineColors.UpdateColorsFromConfig);
+
         c.AppendHeader("Bindings");
-        c.AppendCheckbox("Scroll to jump", () => ScrollJump.isEnabled, ScrollJump.SetValue);
+        c.AppendCheckbox("Scroll to jump", () => ScrollJump.isEnabled.Value, ScrollJump.SetValue);
     }
 }

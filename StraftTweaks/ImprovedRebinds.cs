@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using BepInEx;
+using BepInEx.Configuration;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
@@ -13,19 +14,19 @@ namespace ImprovedRebinds;
 [HarmonyPatch(typeof(InputManager), "LoadBindingOverride")]
 static class AddKeyPressInput
 {
+    // Hard coded values should be fine because this can only ever be bound to scroll AFAIK. The controller weapon swap is bound to some other action name I think....
     static void Prefix(string actionName)
     {
         if (actionName != "ChangeWeapon") return;
         InputAction inputAction = InputManager.inputActions.asset.FindAction(actionName);
-        inputAction.bindings.Do(b => Debug.LogError(b));
 
-        // if (inputAction.bindings.Count == 1)
-        // {
-        //     inputAction.ChangeBinding(0).Erase();
-        //     inputAction.AddCompositeBinding("2DVector").With("Up", "");
-        //     if (PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1").IsNullOrWhiteSpace())
-        //         inputAction.AddBinding("<Mouse>/scroll");
-        // }
+        if (inputAction.bindings.Count == 1)
+        {
+            inputAction.ChangeBinding(0).Erase();
+            inputAction.AddCompositeBinding("2DVector").With("Up", "");
+            if (PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1").IsNullOrWhiteSpace())
+                inputAction.AddBinding("<Mouse>/scroll");
+        }
     }
 }
 
@@ -34,7 +35,7 @@ static class OnBind
 {
     static void Prefix(InputAction actionToRebind, ref bool allCompositeParts)
     {
-        if (actionToRebind.name != "ChangeWeapon")
+        if (actionToRebind.name == "ChangeWeapon")
         {
             if (actionToRebind.bindings.Count == 3)
                 actionToRebind.ChangeBinding(2).Erase();
@@ -69,32 +70,33 @@ static class UpdateBindUI
 [HarmonyPatch(typeof(InputManager), "LoadBindingOverride")]
 static class ScrollJump
 {
-    internal static bool isEnabled;
+    internal static ConfigEntry<bool> isEnabled;
 
     internal static void SetConfigBinds()
     {
-        isEnabled = STRAFTweakPlugin.Instance.Config.Bind("Binding", "Scroll to jump", false).Value;
+        isEnabled = STRAFTweakPlugin.Instance.Config.Bind("Binding", "Scroll to jump", false);
     }
 
     static void Postfix()
     {
         SetConfigBinds();
-        SetValue(isEnabled);
+        SetValue(isEnabled.Value);
     }
 
-    internal static void SetValue(bool scrolljump)
+    internal static void SetValue(bool enabled)
     {
+        isEnabled.Value = enabled;
         var inputAction = InputManager.inputActions.asset.FindAction("Jump");
-        inputAction.bindings.Do(b => Debug.LogError(b));
-        // if (scrolljump)
-        // {
-        //     if (inputAction.bindings.Count > 1) return;
-        //     inputAction.AddBinding("<Mouse>/scroll");
-        // }
-        // else
-        // {
-        //     if (inputAction.bindings.Count == 1) return;
-        //     inputAction.ChangeBinding(1).Erase();
-        // }
+        var indexOfScroll = inputAction.bindings.IndexOf(b => b.path == "<Mouse>/scroll");
+        if (enabled)
+        {
+            if (indexOfScroll == -1)
+                inputAction.AddBinding("<Mouse>/scroll", groups: "Keyboard&Mouse");
+        }
+        else
+        {
+            if (indexOfScroll != -1)
+                inputAction.ChangeBinding(indexOfScroll).Erase();
+        }
     }
 }
