@@ -1,8 +1,10 @@
 using BepInEx;
 using ComputerysModdingUtilities;
 using HarmonyLib;
+using ImprovedRebinds;
 using StraftTweaks;
 using UnityEngine;
+using WeaponOutlineColors;
 
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -21,11 +23,7 @@ public class STRAFTweakPlugin : BaseUnityPlugin
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
         var modMenuLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid);
-        if (modMenuLoaded)
-        {
-            WeaponOutlineColors.ModMenuCompat.Start();
-            ImprovedRebinds.ModMenuCompat.Start();
-        }
+        if (modMenuLoaded) ModMenuCompat.Start();
 
     }
 
@@ -43,4 +41,22 @@ public class STRAFTweakPlugin : BaseUnityPlugin
     //         Debug.LogError(test);
     //     }
     // }
+}
+
+static class ModMenuCompat
+{
+    internal static void Start()
+    {
+        ModMenu.Api.ModMenuCustomisation.SetPluginDescription("Tweak things like weapon outline color or mouse wheel binds :D");
+        SetOutlineColors.SetConfigBinds();
+        ScrollJump.SetConfigBinds();
+        ModMenu.Api.ModMenuCustomisation.RegisterContentBuilder(ConfigBuilder);
+    }
+
+    static void ConfigBuilder(ModMenu.Api.OptionListContext c)
+    {
+        c.AppendButton("Apply Changes", "Apply Changes", SetOutlineColors.UpdateColorsFromConfig);
+        c.AppendHeader("Bindings");
+        c.AppendCheckbox("Scroll to jump", () => ScrollJump.isEnabled, ScrollJump.SetValue);
+    }
 }

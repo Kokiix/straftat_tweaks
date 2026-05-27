@@ -71,14 +71,14 @@ static class ScrollJump
 {
     internal static bool isEnabled;
 
-    internal static void SetBind()
+    internal static void SetConfigBinds()
     {
         isEnabled = STRAFTweakPlugin.Instance.Config.Bind("Binding", "Scroll to jump", false).Value;
     }
 
     static void Postfix()
     {
-        SetBind();
+        SetConfigBinds();
         SetValue(isEnabled);
     }
 
@@ -96,20 +96,5 @@ static class ScrollJump
         //     if (inputAction.bindings.Count == 1) return;
         //     inputAction.ChangeBinding(1).Erase();
         // }
-    }
-}
-
-static class ModMenuCompat
-{
-    internal static void Start()
-    {
-        ModMenu.Api.ModMenuCustomisation.RegisterContentBuilder(ConfigBuilder);
-        ScrollJump.SetBind();
-    }
-
-    static void ConfigBuilder(ModMenu.Api.OptionListContext c)
-    {
-        c.AppendHeader("Bindings");
-        c.AppendCheckbox("Scroll to jump", () => ScrollJump.isEnabled, ScrollJump.SetValue);
     }
 }
