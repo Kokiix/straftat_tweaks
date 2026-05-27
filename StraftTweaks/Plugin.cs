@@ -3,7 +3,6 @@ using ComputerysModdingUtilities;
 using HarmonyLib;
 using StraftTweaks;
 using UnityEngine;
-using WeaponOutlineColors;
 
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -22,7 +21,11 @@ public class STRAFTweakPlugin : BaseUnityPlugin
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
         var modMenuLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid);
-        if (modMenuLoaded) WeaponOutlineColors.ModMenuCompat.Start();
+        if (modMenuLoaded)
+        {
+            WeaponOutlineColors.ModMenuCompat.Start();
+            ImprovedRebinds.ModMenuCompat.Start();
+        }
 
     }
 

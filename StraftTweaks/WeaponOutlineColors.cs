@@ -68,11 +68,10 @@ static class ModMenuCompat
     internal static void Start()
     {
         SetOutlineColors.SetConfigBinds();
-        ModMenu.Api.ModMenuCustomisation.SetPluginDescription("Tweak things like weapon outline color :D");
-        ModMenu.Api.ModMenuCustomisation.RegisterContentBuilder(WeaponOutlineColors.ModMenuCompat.ConfigBuilder);
+        ModMenu.Api.ModMenuCustomisation.SetPluginDescription("Tweak things like weapon outline color or mouse wheel binds :D");
+        ModMenu.Api.ModMenuCustomisation.RegisterContentBuilder(ConfigBuilder);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     internal static void ConfigBuilder(ModMenu.Api.OptionListContext c)
     {
         c.AppendButton("Apply Changes", "Apply Changes", SetOutlineColors.UpdateColorsFromConfig);
