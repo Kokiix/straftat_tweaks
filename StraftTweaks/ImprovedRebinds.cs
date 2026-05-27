@@ -9,39 +9,49 @@ using UnityEngine.InputSystem;
 
 namespace ImprovedRebinds;
 
-/// <summary>
-/// Allow for key binds to swap, and scroll bind to jump
-/// </summary>
-[HarmonyPatch(typeof(InputManager), "DoRebind")]
-static class ScrollBindFixer
+static class Util
 {
-    static void Prefix(InputAction actionToRebind, ref int bindingIndex, TextMeshProUGUI statusText, ref bool allCompositeParts, bool excludeMouse, bool sequenceDisplay)
+    internal static void ReplaceVectorWithComposite(string actionName)
     {
-        Debug.LogError(actionToRebind);
-        Debug.LogError(bindingIndex);
+        var actionToRebind = InputManager.inputActions.asset.FindAction(actionName);
+        actionToRebind.expectedControlType = "2DVector";
 
-        Debug.LogError(actionToRebind.name);
+        // remove mouse bind
+        int scrollIndex = actionToRebind.bindings.IndexOf(b => b.path == "<Mouse>/scroll");
+        if (scrollIndex != -1)
+        {
+            actionToRebind.ChangeBinding(scrollIndex).Erase();
+        }
+
+        // find/create composite bind
+        var newBindIdx = actionToRebind.bindings.IndexOf(b => b.isPartOfComposite);
+        if (newBindIdx == -1)
+            actionToRebind.AddCompositeBinding("2DVector")
+            .With("Up", "<Keyboard>/T");
+    }
+}
+
+[HarmonyPatch(typeof(InputManager), "StartRebind")]
+static class AllowBindToComposite
+{
+    static void Prefix(string actionName, int bindingIndex, TextMeshProUGUI statusText, bool excludeMouse, bool sequenceDisplay)
+    {
+        if (actionName == "ChangeWeapon")
+        {
+            Util.ReplaceVectorWithComposite(actionName);
+        }
+    }
+
+}
+
+[HarmonyPatch(typeof(InputManager), "DoRebind")]
+static class StopCompositeMultiBind
+{
+    static void Prefix(InputAction actionToRebind, ref bool allCompositeParts)
+    {
         if (actionToRebind.name == "ChangeWeapon")
         {
-            actionToRebind.Disable();
-            actionToRebind.expectedControlType = "Button";
-
-            // remove mouse bind
-            // actionToRebind.bindings.Do(b => Debug.LogError(b.path));
-            int scrollIndex = actionToRebind.bindings.IndexOf(b => b.path == "<Mouse>/scroll");
-            if (scrollIndex != -1)
-            {
-                actionToRebind.ChangeBinding(scrollIndex).Erase();
-            }
-
-            // find/create composite bind
-            var newBindIdx = actionToRebind.bindings.IndexOf(b => b.isPartOfComposite);
-            if (newBindIdx == -1)
-                newBindIdx = actionToRebind.AddCompositeBinding("2DVector")
-                .With("Up", "<Keyboard>/T")
-                .bindingIndex + 1;
-
-            bindingIndex = newBindIdx;
+            allCompositeParts = false;
         }
     }
 }
