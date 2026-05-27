@@ -30,4 +30,14 @@ public class STRAFTweakPlugin : BaseUnityPlugin
     {
         _harmony.UnpatchSelf();
     }
+
+    // Debug
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            var test = PlayerPrefs.GetString("PlayerChangeWeapon1");
+            Debug.LogError(test);
+        }
+    }
 }

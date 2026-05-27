@@ -46,3 +46,16 @@ static class StopCompositeMultiBind
         }
     }
 }
+
+[HarmonyPatch(typeof(InputManager), "SaveBindingOverride")]
+static class Test
+{
+    static void Postfix(InputAction action)
+    {
+        for (int i = 0; i < action.bindings.Count; i++)
+        {
+            var test = action.actionMap?.ToString() + action.name + i;
+            Debug.LogError(test.Length);
+        }
+    }
+}
