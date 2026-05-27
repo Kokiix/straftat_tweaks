@@ -10,44 +10,23 @@ using UnityEngine.InputSystem;
 
 namespace ImprovedRebinds;
 
-enum BindingType
+[HarmonyPatch(typeof(InputManager), "LoadBindingOverride")]
+static class AddKeyPressInput
 {
-    Keypress,
-    Scroll,
-}
-
-static class Util
-{
-    internal static void SetBindingType(BindingType type)
+    static void Prefix(string actionName)
     {
-        var actionToRebind = InputManager.inputActions.asset.FindAction("ChangeWeapon");
-        if (type == BindingType.Keypress)
+        InputAction inputAction = InputManager.inputActions.asset.FindAction(actionName);
+        if (inputAction.bindings.Count == 1)
         {
-            actionToRebind.AddCompositeBinding("2DVector").With("Up", "<Keyboard>/T");
-        }
-        else
-        {
-            actionToRebind.AddBinding("<Mouse>/scroll");
-        }
-        actionToRebind.ChangeBinding(0).Erase();
-    }
-}
-
-[HarmonyPatch(typeof(InputManager), "StartRebind")]
-static class AllowBindToComposite
-{
-    static void Prefix(string actionName, int bindingIndex, TextMeshProUGUI statusText, bool excludeMouse, bool sequenceDisplay)
-    {
-        if (actionName == "ChangeWeapon")
-        {
-            Util.SetBindingType(BindingType.Keypress);
+            inputAction.ChangeBinding(0).Erase();
+            inputAction.AddCompositeBinding("2DVector").With("Up", "");
+            inputAction.AddBinding("<Mouse>/scroll");
         }
     }
-
 }
 
 [HarmonyPatch(typeof(InputManager), "DoRebind")]
-static class StopCompositeMultiBind
+static class BindKeyInsteadOfVector
 {
     static void Prefix(InputAction actionToRebind, ref bool allCompositeParts)
     {
@@ -58,29 +37,26 @@ static class StopCompositeMultiBind
     }
 }
 
-[HarmonyPatch(typeof(InputManager), "ResetBinding")]
-static class ResetBinding
+[HarmonyPatch(typeof(ReBindUI), "UpdateUI")]
+static class UpdateWeaponSwapBindDisplay
 {
-    static void Postfix(string actionName)
+    static void Postfix(ReBindUI __instance)
     {
-        Util.SetBindingType(BindingType.Scroll);
-        InputAction inputAction = InputManager.inputActions.asset.FindAction(actionName);
-        inputAction.bindings.Do(b => Debug.LogError(b));
+        var inputAction = __instance.inputActionReference.action;
+        if (inputAction.name == "ChangeWeapon")
+        {
+            var overrideString = PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1");
+            if (overrideString.IsNullOrWhiteSpace())
+            {
+                __instance.rebindText.text = "Scroll";
+            }
+            else
+            {
+                __instance.rebindText.text = overrideString[(overrideString.IndexOf("/") + 1)..].ToUpper();
+            }
+        }
     }
 }
-
-[HarmonyPatch(typeof(InputManager), "LoadBindingOverride")]
-static class ApplyOverride
-{
-    static void Prefix(string actionName)
-    {
-        var overrideString = PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1");
-        if (overrideString.IsNullOrWhiteSpace()) return;
-
-        Util.SetBindingType(BindingType.Keypress);
-    }
-}
-
 
 // [HarmonyPatch(typeof(InputManager), "SaveBindingOverride")]
 // static class Test
