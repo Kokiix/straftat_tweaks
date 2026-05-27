@@ -27,7 +27,7 @@ static class AddKeyPressInput
 }
 
 [HarmonyPatch(typeof(InputManager), "DoRebind")]
-static class BindKeyInsteadOfVector
+static class OnBind
 {
     static void Prefix(InputAction actionToRebind, ref bool allCompositeParts)
     {
@@ -42,7 +42,7 @@ static class BindKeyInsteadOfVector
 }
 
 [HarmonyPatch(typeof(ReBindUI), "UpdateUI")]
-static class UpdateWeaponSwapBindDisplay
+static class UpdateBindUI
 {
     static void Postfix(ReBindUI __instance)
     {
@@ -62,16 +62,3 @@ static class UpdateWeaponSwapBindDisplay
         }
     }
 }
-
-// [HarmonyPatch(typeof(InputManager), "SaveBindingOverride")]
-// static class Test
-// {
-//     static void Postfix(InputAction action)
-//     {
-//         for (int i = 0; i < action.bindings.Count; i++)
-//         {
-//             var test = action.actionMap?.ToString() + action.name + i;
-//             Debug.LogError(test.Length);
-//         }
-//     }
-// }
