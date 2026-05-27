@@ -9,16 +9,28 @@ using UnityEngine.InputSystem;
 
 namespace ImprovedRebinds;
 
+enum BindingType
+{
+    Keypress,
+    Scroll,
+}
+
 static class Util
 {
-    internal static void ReplaceVectorWithComposite(string actionName)
+    internal static void SetBindingType(BindingType type)
     {
-        var actionToRebind = InputManager.inputActions.asset.FindAction(actionName);
-        if (actionToRebind.bindings[0].path == "<Mouse>/scroll")
+        var actionToRebind = InputManager.inputActions.asset.FindAction("ChangeWeapon");
+        if (type == BindingType.Keypress)
         {
-            actionToRebind.ChangeBinding(0).Erase();
             actionToRebind.AddCompositeBinding("2DVector").With("Up", "<Keyboard>/T");
         }
+        else
+        {
+            Debug.LogError("erasing vector thing");
+            actionToRebind.ChangeBinding(1).Erase();
+            actionToRebind.AddBinding("<Mouse>/scroll");
+        }
+        actionToRebind.ChangeBinding(0).Erase();
     }
 }
 
@@ -29,7 +41,7 @@ static class AllowBindToComposite
     {
         if (actionName == "ChangeWeapon")
         {
-            Util.ReplaceVectorWithComposite(actionName);
+            Util.SetBindingType(BindingType.Keypress);
         }
     }
 
@@ -47,15 +59,26 @@ static class StopCompositeMultiBind
     }
 }
 
-[HarmonyPatch(typeof(InputManager), "SaveBindingOverride")]
-static class Test
+[HarmonyPatch(typeof(InputManager), "ResetBinding")]
+static class ResetBinding
 {
-    static void Postfix(InputAction action)
+    static void Postfix(string actionName)
     {
-        for (int i = 0; i < action.bindings.Count; i++)
-        {
-            var test = action.actionMap?.ToString() + action.name + i;
-            Debug.LogError(test.Length);
-        }
+        Util.SetBindingType(BindingType.Scroll);
+        InputAction inputAction = InputManager.inputActions.asset.FindAction(actionName);
+        inputAction.bindings.Do(b => Debug.LogError(b));
     }
 }
+
+// [HarmonyPatch(typeof(InputManager), "SaveBindingOverride")]
+// static class Test
+// {
+//     static void Postfix(InputAction action)
+//     {
+//         for (int i = 0; i < action.bindings.Count; i++)
+//         {
+//             var test = action.actionMap?.ToString() + action.name + i;
+//             Debug.LogError(test.Length);
+//         }
+//     }
+// }

@@ -36,7 +36,7 @@ public class STRAFTweakPlugin : BaseUnityPlugin
     {
         if (Input.GetKeyDown(KeyCode.V))
         {
-            var test = PlayerPrefs.GetString("PlayerChangeWeapon1");
+            var test = PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1");
             Debug.LogError(test);
         }
     }
