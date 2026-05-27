@@ -20,7 +20,8 @@ static class AddKeyPressInput
         {
             inputAction.ChangeBinding(0).Erase();
             inputAction.AddCompositeBinding("2DVector").With("Up", "");
-            inputAction.AddBinding("<Mouse>/scroll");
+            if (PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1").IsNullOrWhiteSpace())
+                inputAction.AddBinding("<Mouse>/scroll");
         }
     }
 }
@@ -32,6 +33,9 @@ static class BindKeyInsteadOfVector
     {
         if (actionToRebind.name == "ChangeWeapon")
         {
+            if (actionToRebind.bindings.Count == 3)
+                actionToRebind.ChangeBinding(2).Erase();
+            actionToRebind.expectedControlType = "Button";
             allCompositeParts = false;
         }
     }
@@ -48,6 +52,7 @@ static class UpdateWeaponSwapBindDisplay
             var overrideString = PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1");
             if (overrideString.IsNullOrWhiteSpace())
             {
+                InputManager.inputActions.asset.FindAction("ChangeWeapon").AddBinding("<Mouse>/scroll");
                 __instance.rebindText.text = "Scroll";
             }
             else

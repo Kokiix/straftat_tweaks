@@ -32,12 +32,12 @@ public class STRAFTweakPlugin : BaseUnityPlugin
     }
 
     // Debug
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            var test = PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1");
-            Debug.LogError(test);
-        }
-    }
+    // void Update()
+    // {
+    //     if (Input.GetKeyDown(KeyCode.V))
+    //     {
+    //         var test = PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1");
+    //         Debug.LogError(test);
+    //     }
+    // }
 }
