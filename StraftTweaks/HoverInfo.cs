@@ -8,24 +8,6 @@ using UnityEngine;
 
 namespace HoverInfo;
 
-static class Config
-{
-    internal static void SetBinds()
-    {
-        OutlineColor.weaponColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Outline Color", new Color(1, 0.8196079f, 0.427451f));
-        OutlineColor.weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(2, 1.106f, 0));
-        OutlineColor.weaponTextBrightness = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 1f);
-
-        OutlineColor.weaponColor.SettingChanged += OutlineColor.UpdateColorsFromConfig;
-        OutlineColor.weaponTextColor.SettingChanged += OutlineColor.UpdateColorsFromConfig;
-        OutlineColor.weaponTextBrightness.SettingChanged += OutlineColor.UpdateColorsFromConfig;
-
-        WeaponInteractPrompt.enablePrompt = STRAFTweakPlugin.Instance.Config.Bind("Hover Prompts", "Enable Weapon Interact Text", true);
-        DoorInteractPrompt.enablePrompt = STRAFTweakPlugin.Instance.Config.Bind("Hover Prompts", "Enable Door Interact Text", true);
-        WeaponInteractPrompt.disableKey = STRAFTweakPlugin.Instance.Config.Bind("Hover Prompts", "Disable Key Prompt", true, "Transform \"Handgun [F]\" into just \"Handgun\". Does the same for door interactions.");
-    }
-}
-
 [HarmonyPatch(typeof(PauseManager), "Awake")]
 static class OutlineColor
 {

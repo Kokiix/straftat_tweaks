@@ -72,12 +72,6 @@ static class ScrollJump
 {
     internal static ConfigEntry<bool> isEnabled;
 
-    internal static void SetConfigBinds()
-    {
-        isEnabled = STRAFTweakPlugin.Instance.Config.Bind("Binding", "Scroll to jump", false);
-        isEnabled.SettingChanged += (_, __) => Postfix();
-    }
-
     internal static void Postfix()
     {
         var inputAction = InputManager.inputActions.asset.FindAction("Jump");
