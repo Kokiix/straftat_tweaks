@@ -27,7 +27,7 @@ static class OutlineColor
     }
 
     internal static readonly int weaponOutline = Shader.PropertyToID("_Color_Outline");
-    static readonly int _textOutline = Shader.PropertyToID("_OutlineColor");
+    internal static readonly int textOutline = Shader.PropertyToID("_OutlineColor");
     internal static readonly int outlineShaderID = Shader.Find("S_WeaponOutline_00").GetInstanceID();
     static Lazy<Material[]> _weaponMaterials = new(() =>
     {
@@ -57,8 +57,8 @@ static class OutlineColor
 
         // Weapon text yoinked from kestrel; Default text is RGBA(2.000, 1.106, 0.000, 1.000)
         var HDR_color = weaponTextColor.Value * Vector4.one * weaponTextBrightness.Value;
-        PauseManager.Instance.grabPopup.fontSharedMaterial.SetColor(_textOutline, HDR_color);
-        PauseManager.Instance.interactPopup.fontSharedMaterial.SetColor(_textOutline, HDR_color);
+        PauseManager.Instance.grabPopup.fontSharedMaterial.SetColor(textOutline, HDR_color);
+        PauseManager.Instance.interactPopup.fontSharedMaterial.SetColor(textOutline, HDR_color);
     }
 }
 
@@ -127,5 +127,9 @@ class RainbowOutline : MonoBehaviour
         {
             mat.SetColor(OutlineColor.weaponOutline, rainbowColor);
         }
+
+        var HDR_color = rainbowColor * Vector4.one * OutlineColor.weaponTextBrightness.Value;
+        PauseManager.Instance.grabPopup.fontSharedMaterial.SetColor(OutlineColor.textOutline, HDR_color);
+        PauseManager.Instance.interactPopup.fontSharedMaterial.SetColor(OutlineColor.textOutline, HDR_color);
     }
 }
