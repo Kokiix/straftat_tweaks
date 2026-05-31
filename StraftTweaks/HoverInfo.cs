@@ -6,24 +6,28 @@ using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
 
-namespace WeaponOutlines;
+namespace HoverInfo;
 
 static class Config
 {
     internal static void SetBinds()
     {
+        OutlineColor.weaponColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Outline Color", new Color(1, 0.8196079f, 0.427451f));
+        OutlineColor.weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(2, 1.106f, 0));
+        OutlineColor.weaponTextBrightness = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 1f);
 
-        SetColors.weaponColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Outline Color", new Color(1, 0.8196079f, 0.427451f));
-        SetColors.weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(2, 1.106f, 0));
-        SetColors.weaponTextBrightness = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 1f);
+        OutlineColor.weaponColor.SettingChanged += OutlineColor.UpdateColorsFromConfig;
+        OutlineColor.weaponTextColor.SettingChanged += OutlineColor.UpdateColorsFromConfig;
+        OutlineColor.weaponTextBrightness.SettingChanged += OutlineColor.UpdateColorsFromConfig;
 
-        WeaponInteractPrompt.enable = STRAFTweakPlugin.Instance.Config.Bind("Hover Prompts", "Enable Weapon Interact Text", true);
-        WeaponInteractPrompt.keyPrompt = STRAFTweakPlugin.Instance.Config.Bind("Hover Prompts", "Enable Weapon Interact Key Prompt", false, "Transform \"Handgun [F]\" into just \"Handgun\".");
+        WeaponInteractPrompt.enablePrompt = STRAFTweakPlugin.Instance.Config.Bind("Hover Prompts", "Enable Weapon Interact Text", true);
+        DoorInteractPrompt.enablePrompt = STRAFTweakPlugin.Instance.Config.Bind("Hover Prompts", "Enable Door Interact Text", true);
+        WeaponInteractPrompt.disableKey = STRAFTweakPlugin.Instance.Config.Bind("Hover Prompts", "Disable Key Prompt", true, "Transform \"Handgun [F]\" into just \"Handgun\". Does the same for door interactions.");
     }
 }
 
 [HarmonyPatch(typeof(PauseManager), "Awake")]
-static class SetColors
+static class OutlineColor
 {
     internal static ConfigEntry<Color> weaponColor;
     internal static ConfigEntry<Color> weaponTextColor;
@@ -47,6 +51,11 @@ static class SetColors
         return Resources.FindObjectsOfTypeAll<Material>()
         .Where(mat => mat.shader.GetInstanceID() == outlineShaderID).ToArray();
     });
+
+    internal static void UpdateColorsFromConfig(object sender, EventArgs args)
+    {
+        UpdateColorsFromConfig();
+    }
 
     internal static void UpdateColorsFromConfig()
     {
@@ -73,14 +82,35 @@ static class SetColors
 [HarmonyPatch(typeof(ItemBehaviour), "OnFocus")]
 static class WeaponInteractPrompt
 {
-    internal static ConfigEntry<bool> enable;
-    internal static ConfigEntry<bool> keyPrompt;
+    internal static ConfigEntry<bool> enablePrompt;
+    internal static ConfigEntry<bool> disableKey;
 
     // Could be transpiled to avoid double string set / extra function call
     static void Postfix(ItemBehaviour __instance)
     {
-        PauseManager.Instance.grabPopup.gameObject.SetActive(enable.Value);
-        if (!keyPrompt.Value)
+        PauseManager.Instance.grabPopup.gameObject.SetActive(enablePrompt.Value);
+        if (disableKey.Value)
             PauseManager.Instance.grabPopup.text = __instance.weaponName.ToLower();
+    }
+}
+
+[HarmonyPatch(typeof(Door), "OnFocus")]
+static class DoorInteractPrompt
+{
+    internal static ConfigEntry<bool> enablePrompt;
+
+    static void Postfix(Door __instance)
+    {
+        PauseManager.Instance.interactPopup.gameObject.SetActive(enablePrompt.Value);
+        if (WeaponInteractPrompt.disableKey.Value)
+            PauseManager.Instance.interactPopup.text = (__instance.sync___get_value_isOpen() ? __instance.closeDoor.ToLower() : __instance.popupText.ToLower());
+    }
+}
+
+class RainbowOutline : MonoBehaviour
+{
+    void Update()
+    {
+        Debug.LogError("test");
     }
 }

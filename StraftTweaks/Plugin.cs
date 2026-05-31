@@ -6,7 +6,7 @@ using HarmonyLib;
 using ImprovedRebinds;
 using StraftTweaks;
 using UnityEngine;
-using WeaponOutlines;
+using HoverInfo;
 
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -24,28 +24,20 @@ public class STRAFTweakPlugin : BaseUnityPlugin
         Instance = this;
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
-        WeaponOutlines.Config.SetBinds();
-        ScrollJump.SetConfigBinds();
-        Config.SettingChanged += ApplyChanges;
+        InitConfig();
 
         var modMenuLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid);
         if (modMenuLoaded) STRAFTweakModMenuCompat.Start();
     }
 
-    void OnDestroy()
+    void InitConfig()
     {
-        Config.SettingChanged -= ApplyChanges;
-        _harmony.UnpatchSelf();
+
     }
 
-    void ApplyChanges(object sender, SettingChangedEventArgs args)
+    void OnDestroy()
     {
-        if (args.ChangedSetting == SetColors.weaponColor
-        || args.ChangedSetting == SetColors.weaponTextColor
-        || args.ChangedSetting == SetColors.weaponTextBrightness)
-            SetColors.UpdateColorsFromConfig();
-        else if (args.ChangedSetting == ScrollJump.isEnabled)
-            ScrollJump.Postfix();
+        _harmony.UnpatchSelf();
     }
 
     // Debug
@@ -53,8 +45,10 @@ public class STRAFTweakPlugin : BaseUnityPlugin
     // {
     //     if (Input.GetKeyDown(KeyCode.V))
     //     {
-    //         var test = PlayerPrefs.GetString("PlayerControls (UnityEngine.InputSystem.InputActionAsset):PlayerChangeWeapon1");
-    //         Debug.LogError(test);
+    //         if (gameObject.TryGetComponent(out TestBehav test))
+    //             UnityEngine.Object.Destroy(test);
+    //         else
+    //             gameObject.AddComponent<TestBehav>();
     //     }
     // }
 }
