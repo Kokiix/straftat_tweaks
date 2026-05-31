@@ -79,7 +79,6 @@ static class ScrollJump
 
     internal static void Postfix()
     {
-        isEnabled.Value = !isEnabled.Value;
         var inputAction = InputManager.inputActions.asset.FindAction("Jump");
         var indexOfScroll = inputAction.bindings.IndexOf(b => b.path == "<Mouse>/scroll");
         if (isEnabled.Value)
