@@ -6,7 +6,7 @@ using HarmonyLib;
 using ImprovedRebinds;
 using StraftTweaks;
 using UnityEngine;
-using WeaponOutlineColors;
+using WeaponOutlines;
 
 [assembly: StraftatMod(isVanillaCompatible: true)]
 
@@ -24,7 +24,7 @@ public class STRAFTweakPlugin : BaseUnityPlugin
         Instance = this;
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
-        SetOutlineColors.SetConfigBinds();
+        WeaponOutlines.Config.SetBinds();
         ScrollJump.SetConfigBinds();
         Config.SettingChanged += ApplyChanges;
 
@@ -40,10 +40,10 @@ public class STRAFTweakPlugin : BaseUnityPlugin
 
     void ApplyChanges(object sender, SettingChangedEventArgs args)
     {
-        if (args.ChangedSetting == SetOutlineColors.weaponColor
-        || args.ChangedSetting == SetOutlineColors.weaponTextColor
-        || args.ChangedSetting == SetOutlineColors.weaponTextBrightness)
-            SetOutlineColors.UpdateColorsFromConfig();
+        if (args.ChangedSetting == SetColors.weaponColor
+        || args.ChangedSetting == SetColors.weaponTextColor
+        || args.ChangedSetting == SetColors.weaponTextBrightness)
+            SetColors.UpdateColorsFromConfig();
         else if (args.ChangedSetting == ScrollJump.isEnabled)
             ScrollJump.Postfix();
     }
