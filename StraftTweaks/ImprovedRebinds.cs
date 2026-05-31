@@ -77,18 +77,12 @@ static class ScrollJump
         isEnabled = STRAFTweakPlugin.Instance.Config.Bind("Binding", "Scroll to jump", false);
     }
 
-    static void Postfix()
+    internal static void Postfix()
     {
-        SetConfigBinds();
-        SetValue(isEnabled.Value);
-    }
-
-    internal static void SetValue(bool enabled)
-    {
-        isEnabled.Value = enabled;
+        isEnabled.Value = !isEnabled.Value;
         var inputAction = InputManager.inputActions.asset.FindAction("Jump");
         var indexOfScroll = inputAction.bindings.IndexOf(b => b.path == "<Mouse>/scroll");
-        if (enabled)
+        if (isEnabled.Value)
         {
             if (indexOfScroll == -1)
                 inputAction.AddBinding("<Mouse>/scroll", groups: "Keyboard&Mouse");

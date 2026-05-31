@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
 
@@ -10,14 +11,14 @@ namespace WeaponOutlineColors;
 [HarmonyPatch(typeof(PauseManager), "Awake")]
 static class SetOutlineColors
 {
-    static Color _weaponColor;
-    static Color _weaponTextColor;
-    static float _weaponTextBrightness;
+    internal static ConfigEntry<Color> weaponColor;
+    internal static ConfigEntry<Color> weaponTextColor;
+    internal static ConfigEntry<float> weaponTextBrightness;
     internal static void SetConfigBinds()
     {
-        _weaponColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Outline Color", new Color(1, 0.8196079f, 0.427451f)).Value;
-        _weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(2, 1.106f, 0)).Value;
-        _weaponTextBrightness = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 1f).Value;
+        weaponColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Outline Color", new Color(1, 0.8196079f, 0.427451f));
+        weaponTextColor = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(2, 1.106f, 0));
+        weaponTextBrightness = STRAFTweakPlugin.Instance.Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 1f);
     }
 
     static bool HasRanOnStartup = false;
@@ -41,10 +42,8 @@ static class SetOutlineColors
 
     internal static void UpdateColorsFromConfig()
     {
-        SetConfigBinds();
-
         // Update stored materials
-        _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, _weaponColor));
+        _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, weaponColor.Value));
 
         // Update live materials
         foreach (var renderer in UnityEngine.Object.FindObjectsOfType<Renderer>())
@@ -52,12 +51,12 @@ static class SetOutlineColors
             foreach (var mat in renderer.sharedMaterials)
             {
                 if (mat && mat.shader.GetInstanceID() == outlineShaderID)
-                    mat.SetColor(_weaponOutline, _weaponColor);
+                    mat.SetColor(_weaponOutline, weaponColor.Value);
             }
         }
 
         // Weapon text yoinked from kestrel; Default text is RGBA(2.000, 1.106, 0.000, 1.000)
-        var HDR_color = _weaponTextColor * Vector4.one * _weaponTextBrightness;
+        var HDR_color = weaponTextColor.Value * Vector4.one * weaponTextBrightness.Value;
         PauseManager.Instance.grabPopup.fontSharedMaterial.SetColor(_textOutline, HDR_color);
         PauseManager.Instance.interactPopup.fontSharedMaterial.SetColor(_textOutline, HDR_color);
     }

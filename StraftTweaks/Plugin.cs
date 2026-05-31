@@ -1,4 +1,6 @@
+using System;
 using BepInEx;
+using BepInEx.Configuration;
 using ComputerysModdingUtilities;
 using HarmonyLib;
 using ImprovedRebinds;
@@ -22,14 +24,30 @@ public class STRAFTweakPlugin : BaseUnityPlugin
         Instance = this;
         this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
-        var modMenuLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid);
-        if (modMenuLoaded) ModMenuCompat.Start();
+        SetOutlineColors.SetConfigBinds();
+        ScrollJump.SetConfigBinds();
+        Config.SettingChanged += ReloadConfig;
 
+        var modMenuLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(ModMenu.PluginInfo.guid);
+        // if (modMenuLoaded) STRAFTweakModMenuCompat.Start();
     }
 
     void OnDestroy()
     {
+        Config.SettingChanged -= ReloadConfig;
         _harmony.UnpatchSelf();
+    }
+
+    void ReloadConfig(object sender, SettingChangedEventArgs args)
+    {
+        Config.Reload();
+
+        if (args.ChangedSetting == SetOutlineColors.weaponColor
+        || args.ChangedSetting == SetOutlineColors.weaponTextColor
+        || args.ChangedSetting == SetOutlineColors.weaponTextBrightness)
+            SetOutlineColors.UpdateColorsFromConfig();
+        else if (args.ChangedSetting == ScrollJump.isEnabled)
+            ScrollJump.Postfix();
     }
 
     // Debug
@@ -43,24 +61,20 @@ public class STRAFTweakPlugin : BaseUnityPlugin
     // }
 }
 
-static class ModMenuCompat
+static class STRAFTweakModMenuCompat
 {
     internal static void Start()
     {
-        ModMenu.Api.ModMenuCustomisation.SetPluginDescription("Tweak things like weapon outline color or mouse wheel binds :D");
-
-        SetOutlineColors.SetConfigBinds();
-        ScrollJump.SetConfigBinds();
-
-        ModMenu.Api.ModMenuCustomisation.HideEntry(ScrollJump.isEnabled);
-        ModMenu.Api.ModMenuCustomisation.RegisterContentBuilder(ConfigBuilder);
+        // Hot relaod
+        // try
+        // {
+        //     ModMenu.Api.ModMenuCustomisation.SetPluginDescription("Tweak things like weapon outline color or mouse wheel binds :D\n\nChanges are applied immediately.");
+        //     ModMenu.Api.ModMenuCustomisation.RegisterContentBuilder(ConfigBuilder);
+        // }
+        // catch (InvalidOperationException) { }
     }
 
-    static void ConfigBuilder(ModMenu.Api.OptionListContext c)
-    {
-        c.InsertButton(4, "Apply Changes", "Apply Changes", SetOutlineColors.UpdateColorsFromConfig);
-
-        c.AppendHeader("Bindings");
-        c.AppendCheckbox("Scroll to jump", () => ScrollJump.isEnabled.Value, ScrollJump.SetValue);
-    }
+    // static void ConfigBuilder(ModMenu.Api.OptionListContext c)
+    // {
+    // }
 }
