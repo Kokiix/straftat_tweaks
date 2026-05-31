@@ -37,6 +37,8 @@ public class STRAFTweakPlugin : BaseUnityPlugin
         OutlineColor.weaponColor = Config.Bind("Outline Colors", "Weapon Outline Color", new Color(1, 0.8196079f, 0.427451f));
         OutlineColor.weaponTextColor = Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(2, 1.106f, 0));
         OutlineColor.weaponTextBrightness = Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 1f);
+        ApplyRainbow.enable = Config.Bind("Outline Colors", "Enable Rainbow Outlines", false);
+        ApplyRainbow.rainbowSpeed = Config.Bind("Outline Colors", "Rainbow Fluctuation Speed", 0.2f, "i have no idea what the unit is for this");
         OutlineColor.weaponColor.SettingChanged += OutlineColor.UpdateColorsFromConfig;
         OutlineColor.weaponTextColor.SettingChanged += OutlineColor.UpdateColorsFromConfig;
         OutlineColor.weaponTextBrightness.SettingChanged += OutlineColor.UpdateColorsFromConfig;

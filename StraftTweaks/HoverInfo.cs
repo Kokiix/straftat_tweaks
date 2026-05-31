@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using BepInEx.Configuration;
@@ -25,9 +26,9 @@ static class OutlineColor
         }
     }
 
-    static readonly int _weaponOutline = Shader.PropertyToID("_Color_Outline");
+    internal static readonly int weaponOutline = Shader.PropertyToID("_Color_Outline");
     static readonly int _textOutline = Shader.PropertyToID("_OutlineColor");
-    static readonly int outlineShaderID = Shader.Find("S_WeaponOutline_00").GetInstanceID();
+    internal static readonly int outlineShaderID = Shader.Find("S_WeaponOutline_00").GetInstanceID();
     static Lazy<Material[]> _weaponMaterials = new(() =>
     {
         return Resources.FindObjectsOfTypeAll<Material>()
@@ -42,7 +43,7 @@ static class OutlineColor
     internal static void UpdateColorsFromConfig()
     {
         // Update stored materials
-        _weaponMaterials.Value.Do(mat => mat.SetColor(_weaponOutline, weaponColor.Value));
+        _weaponMaterials.Value.Do(mat => mat.SetColor(weaponOutline, weaponColor.Value));
 
         // Update live materials
         foreach (var renderer in UnityEngine.Object.FindObjectsOfType<Renderer>())
@@ -50,7 +51,7 @@ static class OutlineColor
             foreach (var mat in renderer.sharedMaterials)
             {
                 if (mat && mat.shader.GetInstanceID() == outlineShaderID)
-                    mat.SetColor(_weaponOutline, weaponColor.Value);
+                    mat.SetColor(weaponOutline, weaponColor.Value);
             }
         }
 
@@ -89,10 +90,42 @@ static class DoorInteractPrompt
     }
 }
 
+[HarmonyPatch(typeof(ItemBehaviour), "OnFocus")]
+static class ApplyRainbow
+{
+    internal static ConfigEntry<bool> enable;
+    internal static ConfigEntry<float> rainbowSpeed;
+
+    // IDK why this method needs to be called every frame TwT
+    static void Postfix(ItemBehaviour __instance)
+    {
+        if (enable.Value && !__instance.gameObject.GetComponent<RainbowOutline>())
+            __instance.gameObject.AddComponent<RainbowOutline>().mats = __instance.hoveredObjectMat;
+    }
+}
+
+[HarmonyPatch(typeof(ItemBehaviour), "OnLoseFocus")]
+static class RemoveRainbow
+{
+    static void Postfix(ItemBehaviour __instance)
+    {
+        if (__instance.gameObject.GetComponent<RainbowOutline>())
+            UnityEngine.Object.Destroy(__instance.gameObject.GetComponent<RainbowOutline>());
+    }
+}
+
+
 class RainbowOutline : MonoBehaviour
 {
+    internal List<Material> mats;
+
     void Update()
     {
-        Debug.LogError("test");
+        float hue = Time.time * ApplyRainbow.rainbowSpeed.Value % 1.0f;
+        Color rainbowColor = Color.HSVToRGB(hue, 1.0f, 1.0f);
+        foreach (var mat in mats)
+        {
+            mat.SetColor(OutlineColor.weaponOutline, rainbowColor);
+        }
     }
 }
