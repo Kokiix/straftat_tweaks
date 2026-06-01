@@ -34,20 +34,24 @@ public class STRAFTweakPlugin : BaseUnityPlugin
     {
         SetJoinMessage.message = Config.Bind("Custom Join Message", "Message", "{USER} has joined the lobby", "{USER} will be replaced with your username.");
 
+        ScrollJump.isEnabled = Config.Bind("Binding", "Scroll to jump", false);
+
         OutlineColor.weaponColor = Config.Bind("Outline Colors", "Weapon Outline Color", new Color(1, 0.8196079f, 0.427451f));
         OutlineColor.weaponTextColor = Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(2, 1.106f, 0));
         OutlineColor.weaponTextBrightness = Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 1f);
         ApplyRainbow.enable = Config.Bind("Outline Colors", "Enable Rainbow Outlines", false);
-        ApplyRainbow.rainbowSpeed = Config.Bind("Outline Colors", "Rainbow Fluctuation Speed", 0.2f, "i have no idea what the unit is for this");
+        ApplyRainbow.rainbowSpeed = Config.Bind("Outline ColorsUOutline ColorsI", "Rainbow Fluctuation Speed", 0.2f, "i have no idea what the unit is for this");
+
+        WeaponInteractPrompt.enablePrompt = Config.Bind("Text Popups", "Enable Weapon Interact Text", true);
+        DoorInteractPrompt.enablePrompt = Config.Bind("Text Popups", "Enable Door Interact Text", true);
+        WeaponInteractPrompt.disableKey = Config.Bind("Text Popups", "Disable Key Prompt", true, "Transform \"Handgun [F]\" into just \"Handgun\". Does the same for door interactions.");
+
+        MinHUDPatch.hideFPS = Config.Bind("HUD", "Hide FPS Display", true);
+        MinHUDPatch.hidePing = Config.Bind("HUD", "Hide Ping Display", true);
+
         OutlineColor.weaponColor.SettingChanged += OutlineColor.UpdateColorsFromConfig;
         OutlineColor.weaponTextColor.SettingChanged += OutlineColor.UpdateColorsFromConfig;
         OutlineColor.weaponTextBrightness.SettingChanged += OutlineColor.UpdateColorsFromConfig;
-
-        WeaponInteractPrompt.enablePrompt = Config.Bind("Hover Prompts", "Enable Weapon Interact Text", true);
-        DoorInteractPrompt.enablePrompt = Config.Bind("Hover Prompts", "Enable Door Interact Text", true);
-        WeaponInteractPrompt.disableKey = Config.Bind("Hover Prompts", "Disable Key Prompt", true, "Transform \"Handgun [F]\" into just \"Handgun\". Does the same for door interactions.");
-
-        ScrollJump.isEnabled = Config.Bind("Binding", "Scroll to jump", false);
         ScrollJump.isEnabled.SettingChanged += (_, __) => ScrollJump.Postfix();
     }
 
