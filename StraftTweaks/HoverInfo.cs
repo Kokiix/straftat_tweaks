@@ -12,6 +12,7 @@ namespace HoverInfo;
 [HarmonyPatch(typeof(PauseManager), "Awake")]
 static class OutlineColor
 {
+    internal static readonly Color DefaultTextColor = new Color(2, 1.106f, 0);
     internal static ConfigEntry<Color> weaponColor;
     internal static ConfigEntry<Color> weaponTextColor;
     internal static ConfigEntry<float> weaponTextBrightness;
@@ -56,7 +57,10 @@ static class OutlineColor
         }
 
         // Weapon text yoinked from kestrel; Default text is RGBA(2.000, 1.106, 0.000, 1.000)
-        var HDR_color = weaponTextColor.Value * Vector4.one * weaponTextBrightness.Value;
+
+        Color HDR_color = weaponTextColor.Value;
+        if (HDR_color != DefaultTextColor)
+            HDR_color = weaponTextColor.Value * Vector4.one * weaponTextBrightness.Value;
         PauseManager.Instance.grabPopup.fontSharedMaterial.SetColor(textOutline, HDR_color);
         PauseManager.Instance.interactPopup.fontSharedMaterial.SetColor(textOutline, HDR_color);
     }
