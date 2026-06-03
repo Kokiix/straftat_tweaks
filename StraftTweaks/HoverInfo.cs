@@ -77,6 +77,17 @@ static class WeaponInteractPrompt
     }
 }
 
+[HarmonyPatch(typeof(PhysicsProp), "OnFocus")]
+static class BarrelInteractPrompt
+{
+    static void Postfix(PhysicsProp __instance)
+    {
+        PauseManager.Instance.interactPopup.gameObject.SetActive(WeaponInteractPrompt.enablePrompt.Value);
+        if (WeaponInteractPrompt.disableKey.Value)
+            PauseManager.Instance.interactPopup.text = (__instance.sync___get_value_grabbed() ? "drop" : "grab") + " " + __instance.popupText.ToLower();
+    }
+}
+
 [HarmonyPatch(typeof(Door), "OnFocus")]
 static class DoorInteractPrompt
 {
