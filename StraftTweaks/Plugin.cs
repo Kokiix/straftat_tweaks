@@ -53,6 +53,7 @@ public class STRAFTweakPlugin : BaseUnityPlugin
         OutlineColor.weaponTextColor.SettingChanged += OutlineColor.UpdateColorsFromConfig;
         OutlineColor.weaponTextBrightness.SettingChanged += OutlineColor.UpdateColorsFromConfig;
         ScrollJump.isEnabled.SettingChanged += (_, __) => ScrollJump.Postfix();
+        ApplyRainbow.enable.SettingChanged += OutlineColor.UpdateColorsFromConfig;
     }
 
     void OnDestroy()
