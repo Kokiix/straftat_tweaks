@@ -40,7 +40,7 @@ public class STRAFTweakPlugin : BaseUnityPlugin
         OutlineColor.weaponTextColor = Config.Bind("Outline Colors", "Weapon Interact Text Color", new Color(2, 1.106f, 0));
         OutlineColor.weaponTextBrightness = Config.Bind("Outline Colors", "Weapon Interact Text Brightness", 1f);
         ApplyRainbow.enable = Config.Bind("Outline Colors", "Enable Rainbow Outlines", false);
-        ApplyRainbow.rainbowSpeed = Config.Bind("Outline ColorsUOutline ColorsI", "Rainbow Fluctuation Speed", 0.2f, "i have no idea what the unit is for this");
+        ApplyRainbow.rainbowSpeed = Config.Bind("Outline Colors", "Rainbow Fluctuation Speed", 0.2f, "i have no idea what the unit is for this");
 
         WeaponInteractPrompt.enablePrompt = Config.Bind("Text Popups", "Enable Weapon Interact Text", true);
         DoorInteractPrompt.enablePrompt = Config.Bind("Text Popups", "Enable Door Interact Text", true);
@@ -59,6 +59,11 @@ public class STRAFTweakPlugin : BaseUnityPlugin
     void OnDestroy()
     {
         _harmony.UnpatchSelf();
+        OutlineColor.weaponColor.SettingChanged -= OutlineColor.UpdateColorsFromConfig;
+        OutlineColor.weaponTextColor.SettingChanged -= OutlineColor.UpdateColorsFromConfig;
+        OutlineColor.weaponTextBrightness.SettingChanged -= OutlineColor.UpdateColorsFromConfig;
+        ScrollJump.isEnabled.SettingChanged -= (_, __) => ScrollJump.Postfix();
+        ApplyRainbow.enable.SettingChanged -= OutlineColor.UpdateColorsFromConfig;
     }
 
     // Debug
